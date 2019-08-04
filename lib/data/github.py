@@ -62,19 +62,6 @@ def generic(request_url, headers=None, plaintext=False):
         return response.json()
 
 
-def repo(repo_id):
-    """
-    This uses an undocumented GitHub API endpoint. Could be deprecated by GitHub without notice.
-    :param repo_id: integer identifier for the repository
-    :return: dict containing repository metadata
-    """
-    try:
-        request_url = 'https://api.github.com/repositories/%s' % repo_id
-    except Exception as e:
-        raise e
-    return generic(request_url)
-
-
 def commit(full_repo_name, commit_sha=None):
     """
 
@@ -83,7 +70,7 @@ def commit(full_repo_name, commit_sha=None):
     :return:
     """
     request_url = 'https://api.github.com/repos/%s/commits/%s' % (full_repo_name, commit_sha)
-    return generic_request(request_url)
+    return generic(request_url)
 
 
 def diff(full_repo_name, commit_sha=None):
@@ -94,7 +81,7 @@ def diff(full_repo_name, commit_sha=None):
     :return:
     """
     request_url = 'https://api.github.com/repos/%s/commits/%s' % (full_repo_name, commit_sha)
-    return generic_request(request_url, headers=diff_header, plaintext=True)
+    return generic(request_url, headers=diff_header, plaintext=True)
 
 
 def pull_request(repo_name, pr_number, get_diff=False):
