@@ -42,20 +42,24 @@ def generic(request_url, headers=None, plaintext=False):
 
     :param request_url:
     :param headers:
+    :param plaintext:
     :return:
     """
     if headers is not None:
         response = requests.get(request_url, auth=http_auth, headers=headers)
     else:
         response = requests.get(request_url, auth=http_auth)
+
     wait_status = rate_reset_wait(response.headers)
     if wait_status != "Positive RateLimit":
         if headers is not None:
             response = requests.get(request_url, auth=http_auth, headers=headers)
         else:
             response = requests.get(request_url, auth=http_auth)
+
     if response.status_code == 404:
         raise Exception(response.json()['message'])
+
     if plaintext:
         return response.content.decode("utf-8", "ignore")
     else:
@@ -64,38 +68,38 @@ def generic(request_url, headers=None, plaintext=False):
 
 def paged_generic(request_url, headers=None, num_pages=1):
     merged_response = list()
+
     for i0 in range(num_pages):
-        # print("Request:", request_url)
         if headers is not None:
             response = requests.get(request_url, auth=http_auth, headers=headers)
         else:
             response = requests.get(request_url, auth=http_auth)
+
         wait_status = rate_reset_wait(response.headers)
         if wait_status == "Positive RateLimit":
             merged_response.extend(response.json())
-
         else:
             if headers is not None:
                 response = requests.get(request_url, auth=http_auth, headers=headers)
             else:
                 response = requests.get(request_url, auth=http_auth)
-
                 merged_response.extend(response.json())
 
+        if 'Link' not in response.headers:
+            break
+
         # Change request_url to next url in the link
-        if 'Link' in response.headers:
-            raw_links = response.headers['Link'].split(',')
-            next_url = None
-            for link in raw_links:
-                split_link = link.split(';')
-                if split_link[1][-6:] == '"next"':
-                    next_url = split_link[0].strip()[1:-1]
-                    break
-            if next_url is not None:
-                request_url = next_url
-            else:
+        raw_links = response.headers['Link'].split(',')
+        next_url = None
+
+        for link in raw_links:
+            split_link = link.split(';')
+            if split_link[1][-6:] == '"next"':
+                next_url = split_link[0].strip()[1:-1]
                 break
-        else:
+
+        request_url = next_url
+        if not next_url:
             break
 
     return merged_response
@@ -115,8 +119,14 @@ def pull_request(repo_name, pr_number):
         raise e
     return response
 
-def pull_request_files():
-    return
+
+def pull_request_files(repo_name, pr_number):
+    request_url = 'https://api.github.com/repos/%s/pulls/%s/files' % (repo_name, pr_number)
+    try:
+        response = generic(request_url)
+    except Exception as e:
+        raise e
+    return response
 
 
 def pull_requests(repo_name, num_pages=1):
