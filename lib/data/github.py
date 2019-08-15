@@ -62,41 +62,63 @@ def generic(request_url, headers=None, plaintext=False):
         return response.json()
 
 
-def commit(full_repo_name, commit_sha=None):
-    """
+def paged_generic(request_url, headers=None, num_pages=1):
+    merged_response = list()
+    for i0 in range(num_pages):
+        # print("Request:", request_url)
+        if headers is not None:
+            response = requests.get(request_url, auth=http_auth, headers=headers)
+        else:
+            response = requests.get(request_url, auth=http_auth)
+        wait_status = rate_reset_wait(response.headers)
+        if wait_status == "Positive RateLimit":
+            merged_response.extend(response.json())
 
-    :param full_repo_name:
-    :param commit_sha:
-    :return:
-    """
-    request_url = 'https://api.github.com/repos/%s/commits/%s' % (full_repo_name, commit_sha)
-    return generic(request_url)
+        else:
+            if headers is not None:
+                response = requests.get(request_url, auth=http_auth, headers=headers)
+            else:
+                response = requests.get(request_url, auth=http_auth)
+
+                merged_response.extend(response.json())
+
+        # Change request_url to next url in the link
+        if 'Link' in response.headers:
+            raw_links = response.headers['Link'].split(',')
+            next_url = None
+            for link in raw_links:
+                split_link = link.split(';')
+                if split_link[1][-6:] == '"next"':
+                    next_url = split_link[0].strip()[1:-1]
+                    break
+            if next_url is not None:
+                request_url = next_url
+            else:
+                break
+        else:
+            break
+
+    return merged_response
 
 
-def diff(full_repo_name, commit_sha=None):
-    """
-
-    :param full_repo_name:
-    :param commit_sha:
-    :return:
-    """
-    request_url = 'https://api.github.com/repos/%s/commits/%s' % (full_repo_name, commit_sha)
-    return generic(request_url, headers=diff_header, plaintext=True)
-
-
-def pull_request(repo_name, pr_number, get_diff=False):
+def pull_request(repo_name, pr_number):
     """
 
     :param repo_name: string in owner/repo_name format
     :param pr_number: integer identifier for the pull request
-    :param get_diff: gets the diff associated with the pull request if true
     :return: dict containing the pull request meta data along with the diff if get_diff was true
     """
     request_url = 'https://api.github.com/repos/%s/pulls/%s' % (repo_name, pr_number)
     try:
         response = generic(request_url)
-        if get_diff:
-            response['diff'] = generic(request_url, diff_header, plaintext=True)
     except Exception as e:
         raise e
     return response
+
+def pull_request_files():
+    return
+
+
+def pull_requests(repo_name, num_pages=1):
+    request_url = 'https://api.github.com/repos/%s/pulls' % repo_name
+    return generic(request_url, headers=reactions_header, num_pages=num_pages)
