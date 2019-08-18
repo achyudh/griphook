@@ -8,7 +8,8 @@ if __name__ == '__main__':
 
     if args.download_meta:
         # Download pull request metadata from a repository
-        download.pr_metadata()
+        download.pr_metadata(args.repository, args.pages)
+
     if args.pr_files:
         # Download files corresponding to a list of pull requests
-        download.pr_files()
+        download.pr_files(args.repository)

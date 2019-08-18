@@ -1,19 +1,17 @@
+import json
+import requests
+import time
 from requests.auth import HTTPBasicAuth
-import requests, json, time
-from flask import Flask
 
 with open('config.json', 'r') as config_file:
     client_config = json.load(config_file)
 
-app = Flask(__name__)
 http_auth_username = client_config['HTTP_AUTH_USERNAME']
 http_auth_secret = client_config['HTTP_AUTH_SECRET']
 http_auth = HTTPBasicAuth(http_auth_username, http_auth_secret)
 
-# Header to get reactions along with comments
-reactions_header = {'Accept': 'application/vnd.github.squirrel-girl-preview',
-                    'direction': 'desc', 'sort': 'created'}
 # Header to get diff along with pull request
+sort_header = {'direction': 'desc', 'sort': 'created'}
 diff_header = {'Accept': 'application/vnd.github.VERSION.diff'}
 
 
@@ -67,6 +65,13 @@ def generic(request_url, headers=None, plaintext=False):
 
 
 def paged_generic(request_url, headers=None, num_pages=1):
+    """
+
+    :param request_url:
+    :param headers:
+    :param num_pages:
+    :return:
+    """
     merged_response = list()
 
     for i0 in range(num_pages):
@@ -121,6 +126,12 @@ def pull_request(repo_name, pr_number):
 
 
 def pull_request_files(repo_name, pr_number):
+    """
+
+    :param repo_name:
+    :param pr_number:
+    :return:
+    """
     request_url = 'https://api.github.com/repos/%s/pulls/%s/files' % (repo_name, pr_number)
     try:
         response = generic(request_url)
@@ -130,5 +141,11 @@ def pull_request_files(repo_name, pr_number):
 
 
 def pull_requests(repo_name, num_pages=1):
+    """
+
+    :param repo_name:
+    :param num_pages:
+    :return:
+    """
     request_url = 'https://api.github.com/repos/%s/pulls' % repo_name
-    return generic(request_url, headers=reactions_header, num_pages=num_pages)
+    return paged_generic(request_url, headers=sort_header, num_pages=num_pages)
