@@ -10,6 +10,10 @@ if __name__ == '__main__':
         # Download pull request metadata from a repository
         download.pr_metadata(args.repository, args.pages)
 
-    if args.pr_files:
+    if args.download_files:
         # Download files corresponding to a list of pull requests
         download.pr_files(args.repository)
+
+    if args.download_diffs:
+        # Download diffs corresponding to a list of pull requests
+        download.pr_diffs(args.repository)
