@@ -1,7 +1,7 @@
 import os
 
-from lib.data.args import get_args
-from lib.data import download
+from lib.pulls.args import get_args
+from lib.pulls import download
 
 if __name__ == '__main__':
     args = get_args()

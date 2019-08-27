@@ -117,7 +117,7 @@ def pull_request(repo_name, pr_number):
 
     :param repo_name: string in owner/repo_name format
     :param pr_number: integer identifier for the pull request
-    :return: dict containing the pull request meta data along with the diff if get_diff was true
+    :return: dict containing the pull request meta pulls along with the diff if get_diff was true
     """
     request_url = 'https://api.github.com/repos/%s/pulls/%s' % (repo_name, pr_number)
     try:
@@ -132,7 +132,7 @@ def pull_request_diff(repo_name, request_url):
 
     :param repo_name: string in owner/repo_name format
     :param request_url: diff url for the pull request
-    :return: dict containing the pull request meta data along with the diff if get_diff was true
+    :return: dict containing the pull request meta pulls along with the diff if get_diff was true
     """
     try:
         response = generic(request_url, plaintext=True)
