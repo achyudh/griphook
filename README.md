@@ -1,5 +1,5 @@
 # GripHook
-A utility for mining and analyzing pull requests from GitHub
+A utility for mining and analyzing GitHub repositories
 
 ## Usage
 - Step 1: Download pull request metadata from a repo
