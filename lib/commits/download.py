@@ -7,9 +7,9 @@ from lib.common import github
 from lib.util.io import create_directory_structure
 
 
-def pr_metadata(repo_name, num_pages):
+def commit_metadata(repo_name, num_pages):
     """
-    Download pull request metadata from a repository
+    Download commit metadata from a repository
     :param repo_name: string in owner/repo_name format
     :param num_pages:
     """
@@ -20,9 +20,9 @@ def pr_metadata(repo_name, num_pages):
         json.dump(metadata_dict, metadata_file)
 
 
-def pr_files(repo_name):
+def commit_files(repo_name):
     """
-    Download files corresponding to a list of pull requests
+    Download files corresponding to a list of commits
     :param repo_name: string in owner/repo_name format
     """
     with open(os.path.join('pulls', repo_name, 'pr_metadata.json'), 'r') as metadata_file:
@@ -36,9 +36,9 @@ def pr_files(repo_name):
         json.dump(metadata_dict, metadata_file)
 
 
-def pr_diffs(repo_name):
+def commit_diffs(repo_name):
     """
-    Download files corresponding to a list of pull requests
+    Download files corresponding to a list of commits
     :param repo_name: string in owner/repo_name format
     """
     with open(os.path.join('pulls', repo_name, 'pr_metadata.json'), 'r') as metadata_file:
