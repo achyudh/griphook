@@ -112,6 +112,39 @@ def paged_generic(request_url, headers=None, num_pages=1):
     return merged_response
 
 
+def diff(diff_url):
+    """
+
+    :param diff_url: diff url for the pull request
+    :return: dict containing the pull request meta pulls along with the diff if get_diff was true
+    """
+    try:
+        response = generic(diff_url, plaintext=True)
+    except Exception as e:
+        raise e
+    return response
+
+
+def commits(repo_name, num_pages=1):
+    """
+
+    :param repo_name:
+    :param num_pages:
+    :return:
+    """
+    pass
+
+
+def commit_files(repo_name, commit_sha):
+    """
+
+    :param repo_name:
+    :param commit_sha:
+    :return:
+    """
+    return None
+
+
 def pull_request(repo_name, pr_number):
     """
 
@@ -122,20 +155,6 @@ def pull_request(repo_name, pr_number):
     request_url = 'https://api.github.com/repos/%s/pulls/%s' % (repo_name, pr_number)
     try:
         response = generic(request_url)
-    except Exception as e:
-        raise e
-    return response
-
-
-def pull_request_diff(repo_name, request_url):
-    """
-
-    :param repo_name: string in owner/repo_name format
-    :param request_url: diff url for the pull request
-    :return: dict containing the pull request meta pulls along with the diff if get_diff was true
-    """
-    try:
-        response = generic(request_url, plaintext=True)
     except Exception as e:
         raise e
     return response
