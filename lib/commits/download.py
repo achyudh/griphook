@@ -46,7 +46,7 @@ def commit_diffs(repo_name):
 
     diffs_dict = dict()
     for commit in tqdm(metadata_dict):
-        diffs_dict[commit['sha']] = github.diff(commit['diff_url'])
+        diffs_dict[commit['sha']] = github.diff('https://github.com/%s/commit/%s.diff' % (repo_name, commit['sha']))
 
     with open(os.path.join('data', 'commits', repo_name, 'commit_diffs.json'), 'w') as metadata_file:
         json.dump(diffs_dict, metadata_file)

@@ -132,7 +132,8 @@ def commits(repo_name, num_pages=1):
     :param num_pages:
     :return:
     """
-    pass
+    request_url = 'https://api.github.com/repos/%s/commits' % repo_name
+    return paged_generic(request_url, headers=sort_header, num_pages=num_pages)
 
 
 def commit_files(repo_name, commit_sha):
@@ -142,7 +143,18 @@ def commit_files(repo_name, commit_sha):
     :param commit_sha:
     :return:
     """
-    return None
+    files = list()
+    request_url = 'https://api.github.com/repos/%s/commits/%s' % (repo_name, commit_sha)
+
+    try:
+        commit = generic(request_url)
+        for commit_file in commit['files']:
+            files[commit_file['filename']] = generic(commit_file['raw_url'], plaintext=True)
+
+    except Exception as e:
+        raise e
+
+    return commit
 
 
 def pull_request(repo_name, pr_number):
